@@ -60,6 +60,17 @@ try {
   assert.equal(result.status, 200)
   assert.equal(result.data.date, '2024-02-29')
 
+  result = await request(`/api/expenses/${expenseId}`, 'PUT', {
+    ...expenseDetails,
+    title: `${testTitle} CAFÉ`,
+    date: '2024-02-29'
+  })
+  assert.equal(result.status, 200)
+  const unicodeMatches = await request(`/api/expenses?title=${encodeURIComponent(`${testTitle} café`)}`)
+  assert.equal(unicodeMatches.status, 200)
+  assert.equal(unicodeMatches.data.length, 1)
+  assert.equal(unicodeMatches.data[0].id, expenseId)
+
   const titleQuery = `/api/expenses?title=${encodeURIComponent(testTitle)}`
   const expensesBeforeInvalidDates = (await request(titleQuery)).data
   const invalidDates = [

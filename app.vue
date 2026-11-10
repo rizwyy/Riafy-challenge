@@ -55,6 +55,8 @@ async function refreshExpenses() {
 }
 
 async function saveExpense() {
+  if (isSaving.value) return
+
   errorMessage.value = ''
   isSaving.value = true
 
@@ -482,12 +484,14 @@ td {
 }
 
 .link {
-  background: none;
+  background: #e8f3ed;
   color: #236c50;
-  padding: 0;
+  padding: 7px 12px;
+  box-shadow: 0 2px 4px #183b261a;
 }
 
 .danger {
+  background: #fcebea;
   color: #a34040;
 }
 

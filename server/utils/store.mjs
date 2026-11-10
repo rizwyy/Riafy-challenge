@@ -120,12 +120,11 @@ export function createStore(path = process.env.EXPENSE_DB || 'expenses.sqlite') 
         sql += ' AND date <= ?'
         parameters.push(to)
       }
-      if (title) {
-        sql += ' AND instr(lower(title), lower(?)) > 0'
-        parameters.push(title.trim())
-      }
-      return db.prepare(sql + ' ORDER BY date DESC, id DESC')
-        .all(...parameters)
+      const rows = db.prepare(sql + ' ORDER BY date DESC, id DESC').all(...parameters)
+      // SQLite's built-in lower() handles ASCII only, so compare titles in JavaScript.
+      const titleSearch = title ? title.trim().toLowerCase() : ''
+      return rows
+        .filter(row => row.title.toLowerCase().includes(titleSearch))
         .map(formatExpense)
     },
     add(input) {

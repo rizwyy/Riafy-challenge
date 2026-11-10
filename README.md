@@ -4,7 +4,7 @@ A local, single-user expense tracker built with Nuxt 3, its server routes, and S
 
 ## Run
 
-Requires Node.js 22.13 or newer and npm. Node's built-in SQLite API is experimental in Node 22 and may print a warning.
+Requires Node.js 22.13 or newer and npm; verified with Node.js 22.14.0 and npm 10.9.2. Node's built-in SQLite API is experimental in Node 22 and may print a warning.
 
 ```sh
 npm install
@@ -21,7 +21,7 @@ Open the local URL printed in the terminal (normally http://127.0.0.1:3000). To 
 4. Filter by category, inclusive from/to dates, and part of a title, individually and together. Clear the filters; search for text that matches nothing to see the empty state.
 5. Try a blank title, zero or negative amount, more than two decimal places, and a from date later than the to date. The form or API rejects invalid input.
 
-Automated storage tests cover the operations, validation, monthly summary, filters, sorting, and persistence:
+Automated tests cover storage operations, validation, monthly summaries, filters, sorting, persistence, and client handlers (including failed saves and duplicate-submission protection). Client-handler tests are not browser tests:
 
 ```sh
 npm test
@@ -39,7 +39,7 @@ The HTTP check creates and deletes its own test expense. Use `BASE_URL=http://12
 
 - Nuxt keeps the UI and API together; SQLite needs no separate database service. Built-in SQLite avoids an additional database package but ties the app to a recent Node version and currently emits an experimental warning.
 - All requested features are implemented. Authentication, multiple users, and deployment are omitted because the brief does not require them. Multi-currency is outside the requested scope. The app is intended for local use, not exposure to the internet.
-- Title searches use SQLite's built-in case conversion, which is case-insensitive for ASCII characters but not necessarily for all Unicode characters. Title and note limits are 100 and 2,000 characters; amounts must be positive with up to two decimal places.
+- Title searches use JavaScript lowercase conversion for case-insensitive partial matches, including accented letters. They do not perform accent removal or locale-specific collation. Category/date filters use SQL; title matching runs in Node for this small local dataset. Title and note limits are 100 and 2,000 characters; amounts must be positive with up to two decimal places.
 - The month uses the computer's local date and time. Browser and server should use the same local timezone.
 - `npm install` reported dependency security advisories; run `npm audit` for the current details. The local development server should not be exposed publicly.
 

@@ -179,3 +179,19 @@ test('invalid supplied dates are rejected on creation and editing without changi
     store.close()
   }
 })
+
+
+test('partial title filters ignore Unicode case and combine with other filters', () => {
+  const store = createStore(':memory:')
+  try {
+    const coffee = store.add({ ...exampleExpense, title: 'Coffee at CAFÉ' })
+    store.add({ ...exampleExpense, title: 'CAFÉ bus', category: 'Transport' })
+    assert.deepEqual(
+      store.list({ title: 'café', category: 'Food', from: exampleExpense.date, to: exampleExpense.date }),
+      [coffee]
+    )
+    assert.deepEqual(store.list({ title: "' OR 1=1 --" }), [])
+  } finally {
+    store.close()
+  }
+})
