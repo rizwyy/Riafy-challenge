@@ -1,0 +1,16 @@
+{
+  "name": "personal-expense-tracker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev --host 127.0.0.1",
+    "build": "nuxt build",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "nuxt": "3.17.5"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  }
+}
