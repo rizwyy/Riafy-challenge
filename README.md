@@ -6,7 +6,9 @@ A local, single-user expense tracker built with Nuxt 3, its server routes, and S
 
 Requires Node.js 22.13 or newer and npm; verified with Node.js 22.14.0 and npm 10.9.2. Node's built-in SQLite API is experimental in Node 22 and may print a warning.
 
-```sh
+```bash
+git clone https://github.com/rizwyy/Riafy-challenge.git
+cd Riafy-challenge
 npm install
 npm run dev
 ```
