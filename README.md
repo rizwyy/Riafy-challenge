@@ -38,7 +38,15 @@ The HTTP check creates and deletes its own test expense. Use `BASE_URL=http://12
 ## Choices and limitations
 
 - Nuxt keeps the UI and API together; SQLite needs no separate database service. Built-in SQLite avoids an additional database package but ties the app to a recent Node version and currently emits an experimental warning.
-- All requested features are implemented. Authentication, multiple users, deployment, and multi-currency are deliberately omitted because the brief excludes them. The app is intended for local use, not exposure to the internet.
+- All requested features are implemented. Authentication, multiple users, and deployment are omitted because the brief does not require them. Multi-currency is outside the requested scope. The app is intended for local use, not exposure to the internet.
 - Title searches use SQLite's built-in case conversion, which is case-insensitive for ASCII characters but not necessarily for all Unicode characters. Title and note limits are 100 and 2,000 characters; amounts must be positive with up to two decimal places.
 - The month uses the computer's local date and time. Browser and server should use the same local timezone.
 - `npm install` reported dependency security advisories; run `npm audit` for the current details. The local development server should not be exposed publicly.
+
+## Data flow
+
+`app.vue` holds the form and filter state and calls the Nuxt API routes with `$fetch`. The routes read requests and choose HTTP responses. `server/utils/store.mjs` validates inputs, converts rupees to integer paise, and uses parameterized SQLite queries. Responses convert paise back to rupees; after a change, the page reloads the list and monthly summary.
+
+## Known validation issue
+
+The API currently treats falsy date values such as `false` and `0` as an omitted date and defaults them to today. This existing behavior was preserved during the readability cleanup; the browser date input normally supplies a string.
