@@ -47,6 +47,6 @@ The HTTP check creates and deletes its own test expense. Use `BASE_URL=http://12
 
 `app.vue` holds the form and filter state and calls the Nuxt API routes with `$fetch`. The routes read requests and choose HTTP responses. `server/utils/store.mjs` validates inputs, converts rupees to integer paise, and uses parameterized SQLite queries. Responses convert paise back to rupees; after a change, the page reloads the list and monthly summary.
 
-## Known validation issue
+## Date validation
 
-The API currently treats falsy date values such as `false` and `0` as an omitted date and defaults them to today. This existing behavior was preserved during the readability cleanup; the browser date input normally supplies a string.
+On both creation and editing, omitting the date defaults it to today. If a date is supplied, it must be a nonempty `YYYY-MM-DD` string representing a valid calendar date. Non-string values (including `null`, `false`, `0`, arrays, and objects), empty strings, and impossible dates are rejected with HTTP 400.

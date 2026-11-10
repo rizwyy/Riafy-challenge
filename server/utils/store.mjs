@@ -52,7 +52,7 @@ function validateExpense(input) {
   if (!categories.includes(input.category)) {
     throwValidationError('Choose a valid category.')
   }
-  const date = input.date || today()
+  const date = Object.hasOwn(input, 'date') ? input.date : today()
   if (!isValidDate(date)) {
     throwValidationError('Enter a valid date.')
   }

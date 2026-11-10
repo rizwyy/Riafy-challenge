@@ -54,7 +54,9 @@ test('default date and current month summary ignore older expenses', () => {
   const store = createStore(':memory:')
   try {
     assert.equal(store.summary().total, 0)
-    assert.equal(store.add({ ...exampleExpense, date: '', amount: '0.10' }).date, today())
+    const expenseWithoutDate = { ...exampleExpense, amount: '0.10' }
+    delete expenseWithoutDate.date
+    assert.equal(store.add(expenseWithoutDate).date, today())
     store.add({ ...exampleExpense, date: today(), amount: '0.20' })
     store.add({ ...exampleExpense, date: today(), category: 'Bills', amount: '10.00' })
     store.add({ ...exampleExpense, date: '2000-01-01', amount: '100' })
@@ -116,5 +118,64 @@ test('expenses persist after reopening the database', async () => {
     reopenedStore.close()
   } finally {
     rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+
+test('date defaults to today only when omitted on creation and editing', () => {
+  const store = createStore(':memory:')
+  const expenseWithoutDate = { ...exampleExpense }
+  delete expenseWithoutDate.date
+
+  try {
+    const expense = store.add(expenseWithoutDate)
+    assert.equal(expense.date, today())
+
+    const leapDay = '2024-02-29'
+    assert.equal(store.add({ ...exampleExpense, date: leapDay }).date, leapDay)
+    assert.equal(store.update(expense.id, { ...exampleExpense, date: leapDay }).date, leapDay)
+    assert.equal(store.update(expense.id, expenseWithoutDate).date, today())
+  } finally {
+    store.close()
+  }
+})
+
+test('invalid supplied dates are rejected on creation and editing without changing data', () => {
+  const store = createStore(':memory:')
+  const invalidDates = [
+    false,
+    true,
+    0,
+    123,
+    null,
+    undefined,
+    [],
+    ['2026-11-10'],
+    {},
+    { date: '2026-11-10' },
+    '',
+    ' ',
+    'not-a-date',
+    '2026-02-30',
+    '2025-02-29',
+    '2026-13-01',
+    '2026-00-01',
+    '2026-11-31',
+    '2026-1-01',
+    '2026-01-01T00:00:00Z',
+    ' 2026-01-01 '
+  ]
+
+  try {
+    const originalExpense = store.add(exampleExpense)
+    for (const date of invalidDates) {
+      const input = { ...exampleExpense, title: 'Must not be saved', date }
+      const expectedError = { statusCode: 400, statusMessage: 'Enter a valid date.' }
+      assert.throws(() => store.add(input), expectedError)
+      assert.throws(() => store.update(originalExpense.id, input), expectedError)
+      assert.deepEqual(store.list(), [originalExpense])
+    }
+  } finally {
+    store.close()
   }
 })
